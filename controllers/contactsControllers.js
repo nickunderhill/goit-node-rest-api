@@ -1,26 +1,39 @@
 import * as contactService from "../services/contactsServices.js";
 
 export const getAllContacts = async (req, res) => {
-    const contacts = await contactService.listContacts();
-    res.status(200).json(contacts);
+    try {
+        const contacts = await contactService.listContacts();
+        res.status(200).json(contacts);
+    }
+    catch (err) {
+        next(err);
+    }
 };
 
 export const getOneContact = async (req, res) => {
-    const { id } = req.params;
-    const contact = await contactService.getContactById(id);
-    if (!contact) {
-        return res.status(404).json({ message: "Not found" });
+    try {
+        const { id } = req.params;
+        const contact = await contactService.getContactById(id);
+        if (!contact) {
+            return res.status(404).json({ message: "Not found" });
+        }
+        res.status(200).json(contact);
+    } catch (err) {
+        next(err);
     }
-    res.status(200).json(contact);
 };
 
 export const deleteContact = async (req, res) => {
-    const { id } = req.params;
-    const contact = await contactService.removeContact(id);
-    if (!contact) {
-        return res.status(404).json({ message: "Not found" });
+    try {
+        const { id } = req.params;
+        const contact = await contactService.removeContact(id);
+        if (!contact) {
+            return res.status(404).json({ message: "Not found" });
+        }
+        res.status(200).json(contact);
+    } catch (err) {
+        next(err);
     }
-    res.status(200).json(contact);
 };
 
 export const createContact = async (req, res) => {
@@ -42,7 +55,6 @@ export const updateContact = async (req, res) => {
         const updatedContact = await contactService.updateContact(id, req.body);
         res.status(200).json(updatedContact);
     } catch (err) {
-        console.log(err);
         next(err);
     }
 };
