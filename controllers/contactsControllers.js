@@ -3,8 +3,9 @@ import * as contactService from "../services/contactsServices.js";
 const checkContactExists = async (id, res) => {
     const contact = await contactService.getContactById(id);
     if (!contact) {
-        res.status(404).json({ message: "Not found" });
-        return null;
+        const error = new Error("Not found");
+        error.status = 404;
+        throw error;
     }
     return contact;
 };

@@ -1,8 +1,11 @@
 
 import Sequelize from "sequelize";
 
-const dbConnection = new Sequelize('db_contacts_lpko', 'db_contacts_lpko_user', 'rK1JVYppSmJYhMoo8Qq4A9fils3ZNIZS', {
-    host: 'dpg-cv7snk8fnakc73dtidj0-a.frankfurt-postgres.render.com',
+const { DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS } = process.env;
+
+const dbConnection = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
+    host: DB_HOST,
+    port: DB_PORT,
     dialect: 'postgres',
     dialectOptions: {
         ssl: {
