@@ -11,7 +11,6 @@ const checkContactExists = async (id, res) => {
 };
 
 export const getAllContacts = async (req, res, next) => {
-    // contactService.populateContacts();
     try {
         const contacts = await contactService.listContacts();
         res.status(200).json(contacts);
