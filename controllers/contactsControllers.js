@@ -1,18 +1,18 @@
 import * as contactService from "../services/contactsServices.js";
 
-const checkContactExists = async (id, res) => {
-    const contact = await contactService.getContactById(id);
+const checkContactExists = async (id, userId, res) => {
+    const contact = await contactService.getContact(id, userId);
     if (!contact) {
-        const error = new Error("Not found");
-        error.status = 404;
-        throw error;
+        res.status(404).json({ message: "Not found" });
+        return null;
     }
     return contact;
 };
 
 export const getAllContacts = async (req, res, next) => {
     try {
-        const contacts = await contactService.listContacts();
+        const user = req.user;
+        const contacts = await contactService.listContacts(user.id);
         res.status(200).json(contacts);
     }
     catch (err) {
@@ -24,10 +24,9 @@ export const getAllContacts = async (req, res, next) => {
 export const getOneContact = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const contact = await contactService.getContactById(id);
-        if (!contact) {
-            return res.status(404).json({ message: "Not found" });
-        }
+        const user = req.user;
+        const contact = await checkContactExists(id, user.id, res);
+        if (!contact) return;
         res.status(200).json(contact);
     } catch (err) {
         console.log(err);
@@ -38,10 +37,10 @@ export const getOneContact = async (req, res, next) => {
 export const deleteContact = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const contact = await contactService.removeContact(id);
-        if (!contact) {
-            return res.status(404).json({ message: "Not found" });
-        }
+        const user = req.user;
+        const contact = await checkContactExists(id, user.id, res);
+        if (!contact) return;
+        await contactService.removeContact(id, user.id);
         res.status(200).json(contact);
     } catch (err) {
         console.log(err);
@@ -51,7 +50,8 @@ export const deleteContact = async (req, res, next) => {
 
 export const createContact = async (req, res, next) => {
     try {
-        const newContact = await contactService.addContact(req.body);
+        const user = req.user;
+        const newContact = await contactService.addContact(req.body, user.id);
         res.status(201).json(newContact);
     } catch (err) {
         console.log(err);
@@ -62,9 +62,10 @@ export const createContact = async (req, res, next) => {
 export const updateContact = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const contact = await checkContactExists(id, res);
+        const user = req.user;
+        const contact = await checkContactExists(id, user.id, res);
         if (!contact) return;
-        const updatedContact = await contactService.updateContact(id, req.body);
+        const updatedContact = await contactService.updateContact(id, user.id, req.body);
         res.status(200).json(updatedContact);
     } catch (err) {
         console.log(err);
@@ -75,9 +76,10 @@ export const updateContact = async (req, res, next) => {
 export const updateFavorite = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const contact = await checkContactExists(id, res);
+        const user = req.user;
+        const contact = await checkContactExists(id, user.id, res);
         if (!contact) return;
-        const updatedContact = await contactService.updateStatusContact(id, req.body);
+        const updatedContact = await contactService.updateStatusContact(id, user.id, req.body);
         res.status(200).json(updatedContact);
     }
     catch (err) {
@@ -85,4 +87,3 @@ export const updateFavorite = async (req, res, next) => {
         next(err);
     }
 };
-

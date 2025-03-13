@@ -3,7 +3,12 @@ import * as userService from "../services/usersServices.js";
 export const register = async (req, res, next) => {
     try {
         const newUser = await userService.register(req.body);
-        res.status(201).json(newUser);
+        res.status(201).json({
+            "user": {
+                "email": newUser.email,
+                "subscription": newUser.subscription,
+            }
+        });
     }
     catch (err) {
         console.log(err);

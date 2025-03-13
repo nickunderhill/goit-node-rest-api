@@ -1,15 +1,24 @@
 import Contact from '../db/models/contact.js';
 
-export async function listContacts() {
-    return Contact.findAll();
+export async function listContacts(userId) {
+    return Contact.findAll({
+        where: {
+            owner: userId
+        }
+    });
 }
 
-export async function getContactById(contactId) {
-    return Contact.findByPk(contactId);
+export async function getContact(contactId, userId) {
+    return await Contact.findOne({
+        where: {
+            id: contactId,
+            owner: userId
+        }
+    });
 }
 
-export async function removeContact(contactId) {
-    const contact = await Contact.findByPk(contactId);
+export async function removeContact(contactId, userId) {
+    const contact = await getContact(contactId, userId);
     if (!contact) {
         return null;
     }
@@ -23,31 +32,33 @@ export async function removeContact(contactId) {
     return contact;
 }
 
-export async function addContact(data) {
+export async function addContact(data, userId) {
     const { name, email, phone } = data;
     return await Contact.create({
         name,
         email,
-        phone
+        phone,
+        owner: userId,
     });
 }
 
-export async function updateContact(id, data) {
+export async function updateContact(id, userId, data) {
     await Contact.update(
         { ...data },
         {
             where: {
                 id: id,
+                owner: userId,
             },
         }
     );
-    return await Contact.findByPk(id);
+    return await getContact(id, userId);
 }
 
-export async function updateStatusContact(contactId, body) {
+export async function updateStatusContact(contactId, userId, body) {
     const { favorite } = body;
     if (typeof favorite !== 'boolean') {
         throw TypeError('favorite field must be a boolean');
     }
-    return updateContact(contactId, { favorite });
+    return updateContact(contactId, userId, { favorite });
 }
