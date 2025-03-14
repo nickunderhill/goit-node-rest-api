@@ -1,4 +1,4 @@
-# Node.js REST API - Домашнє завдання 4
+# Node.js REST API - Домашнє завдання 5
 
 This is a simple Node.js REST API for managing contacts. It allows you to
 create, read, update, and delete contacts.
@@ -66,6 +66,7 @@ The server will be running on http://localhost:3000.
 - **POST /api/auth/login**: Log in a user
 - **POST /api/auth/logout**: Log out a user
 - **GET /api/auth/current**: Current user information
+- **PATCH /api/auth/avatars**: Update user avatar
 
 ## Authentication
 
@@ -108,6 +109,24 @@ Include the token in the `Authorization` header for protected endpoints:
 
 ```sh
 curl -X GET http://localhost:3000/api/contacts -H "Authorization: Bearer your_jwt_token"
+```
+
+### Update Avatar
+
+To update the user's avatar, use the `/api/auth/avatars` endpoint with a `PATCH`
+request. The request should include the avatar file in the `multipart/form-data`
+format and the JWT token in the `Authorization` header.
+
+```sh
+curl -X PATCH http://localhost:3000/api/auth/avatars -H "Authorization: Bearer your_jwt_token" -F "avatar=@path_to_your_avatar_file"
+```
+
+The response will include the new avatar URL:
+
+```json
+{
+  "avatarURL": "/avatars/your_avatar_filename"
+}
 ```
 
 ## License
