@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import gravatar from "gravatar";
 
 import User from '../db/models/users.js';
 
@@ -12,7 +13,8 @@ export async function register(data) {
         throw error;
     }
     const hashedPassword = await hashPassword(password);
-    await User.create({ email, password: hashedPassword });
+    const avatarURL = gravatar.url(email, { protocol: 'https', s: '200' });
+    await User.create({ email, password: hashedPassword, avatarURL: avatarURL });
     return await User.findOne({ where: { email } });
 };
 
@@ -43,6 +45,17 @@ export async function logout(id) {
 
 export async function findUserById(id) {
     return await User.findOne({ where: { id } });
+}
+
+export async function updateAvatar(id, avatarURL) {
+    const user = await findUserById(id);
+    if (!user) {
+        const error = new Error("Unauthorized");
+        error.status = 401;
+        throw error;
+    }
+    user.avatarURL = avatarURL;
+    return await user.save();
 }
 
 const hashPassword = async (password) => {
